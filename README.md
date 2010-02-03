@@ -24,5 +24,5 @@ I recommend binding RunTests to a key, for example:
     map <F12> :w<CR>:call RunTests()<CR>
     imap <F12> <ESC>:w<CR>:call RunTests()<CR>
 
-In your ~/.vimrc
+In your ~/.vimrc will bind F12 to save-and-run-test
 
