@@ -1,4 +1,4 @@
-function! RunRspec()
+function! RunTests()
 ruby << EOF
   buffer = VIM::Buffer.current
   filename = buffer.name
