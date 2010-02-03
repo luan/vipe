@@ -21,8 +21,8 @@ editing, or anything you like with whatever you throw at the named pipe.
 
 I recommend binding RunTests to a key, for example:
 
-  map <F12> :w<CR>:call RunTests()<CR>
-  imap <F12> <ESC>:w<CR>:call RunTests()<CR>
+    map <F12> :w<CR>:call RunTests()<CR>
+    imap <F12> <ESC>:w<CR>:call RunTests()<CR>
 
 In your ~/.vimrc
 
