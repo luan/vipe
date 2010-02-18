@@ -10,6 +10,15 @@ def send_to_test_server(command)
 end
 EOF
 
+function! RunScenario(scenario)
+ruby << EOF
+  buffer = VIM::Buffer.current
+  filename = buffer.name
+  command = "cucumber #{buffer.name} --name '#{VIM::evaluate('a:scenario')}'"
+  send_to_test_server(command)
+EOF
+endfunction
+
 function! RunTest()
 ruby << EOF
   buffer = VIM::Buffer.current
