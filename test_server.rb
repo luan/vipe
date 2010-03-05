@@ -6,7 +6,8 @@ pipe_path = File.join(ENV['HOME'], 'test_server_pipe')
 while true do
   File.open pipe_path, 'w+' do |file|
     command = file.gets
-    puts "\r\n#{command}"
+    system "clear"
+    puts command
     system command
   end
 end
