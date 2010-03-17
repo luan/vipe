@@ -26,7 +26,10 @@ ruby << EOF
   extname = File.extname(buffer.name)
   command = if extname.strip == '.feature'
               then "cucumber #{buffer.name}"
-            else "spec #{buffer.name}"
+            elsif filename =~ /_spec\.rb/
+              then "spec #{buffer.name}"
+            else
+              "spec #{buffer.name.gsub('app/models', 'spec/models').gsub('.rb', '_spec.rb')}"
             end
   send_to_test_server(command)
 EOF
