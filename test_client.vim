@@ -29,7 +29,11 @@ ruby << EOF
             elsif filename =~ /_spec\.rb/
               then "spec #{buffer.name}"
             else
-              "spec #{buffer.name.gsub('app/models', 'spec/models').gsub('.rb', '_spec.rb')}"
+              spec_filename = buffer.name.
+                gsub('lib', 'spec/lib').
+                gsub('app/models', 'spec/models').
+                gsub('.rb', '_spec.rb')
+              "spec #{spec_filename}"
             end
   send_to_test_server(command)
 EOF
