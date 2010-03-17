@@ -30,6 +30,7 @@ ruby << EOF
               then "spec #{buffer.name}"
             else
               spec_filename = buffer.name.
+                gsub('app/helpers', 'spec/helpers').
                 gsub('lib', 'spec/lib').
                 gsub('app/models', 'spec/models').
                 gsub('.rb', '_spec.rb')
