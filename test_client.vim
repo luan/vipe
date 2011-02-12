@@ -1,10 +1,8 @@
 ruby << EOF
 def send_to_test_server(command)
-  fork do
-    File.open(File.join(ENV['HOME'], 'test_server_pipe'), 'w+') do |pipe|
-      pipe.puts command
-      pipe.flush
-    end
+  File.open(File.join(ENV['HOME'], 'test_server_pipe'), 'w+') do |pipe|
+    pipe.puts command
+    pipe.flush
   end
   print "Sent #{command}"
 end
