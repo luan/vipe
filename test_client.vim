@@ -38,6 +38,7 @@ ruby << EOF
                 gsub('app/helpers', 'spec/helpers').
                 gsub('lib', 'spec/lib').
                 gsub('app/models', 'spec/models').
+                gsub('app/mailers', 'spec/mailers').
                 gsub('.rb', '_spec.rb')
               "#{rspec} #{spec_filename}"
             end
