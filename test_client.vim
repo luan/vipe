@@ -5,6 +5,7 @@ cucumber = 'CUCUMBER_FORMAT=pretty bundle exec cucumber -r features'
 #rspec = 'jruby -S bundle exec /Users/andrew/dev/jruby-1.5.6/bin/spec'
 rspec = 'bundle exec rspec'
 #rspec = 'vendor/plugins/rspec/bin/spec'
+vows = 'vows --spec'
 
 def send_to_test_server(command)
   File.open(File.join(ENV['HOME'], 'test_server_pipe'), 'w+') do |pipe|
@@ -35,6 +36,8 @@ ruby << EOF
               then "#{cucumber} #{filename}"
             elsif filename =~ /_spec\.rb/
               then "#{rspec} #{filename}"
+            elsif extname.strip == '.js'
+              then "cd #{dir} && #{vows} #{basename}"
             else
               spec_filename = filename.
                 gsub('app/helpers', 'spec/helpers').
