@@ -29,12 +29,14 @@ ruby << EOF
   buffer = VIM::Buffer.current
   filename = buffer.name
   extname = File.extname(buffer.name)
+  dir = File.dirname(filename)
+  basename = File.basename(filename)
   command = if extname.strip == '.feature'
-              then "#{cucumber} #{buffer.name}"
+              then "#{cucumber} #{filename}"
             elsif filename =~ /_spec\.rb/
-              then "#{rspec} #{buffer.name}"
+              then "#{rspec} #{filename}"
             else
-              spec_filename = buffer.name.
+              spec_filename = filename.
                 gsub('app/helpers', 'spec/helpers').
                 gsub('lib', 'spec/lib').
                 gsub('app/models', 'spec/models').
