@@ -38,6 +38,8 @@ ruby << EOF
               then "#{rspec} #{filename}"
             elsif extname.strip == '.js'
               then "cd #{dir} && #{vows} #{basename}"
+            elsif filename =~ /html\.erb$/
+              then "#{rspec} #{filename.sub('app/views', 'spec/views')}_spec.rb"
             else
               spec_filename = filename.
                 gsub('app/helpers', 'spec/helpers').
