@@ -3,7 +3,7 @@ ruby << EOF
 #cucumber = 'jruby -S bundle exec /Users/andrew/dev/jruby-1.5.6/bin/cucumber'
 cucumber = 'CUCUMBER_FORMAT=pretty bundle exec cucumber -r features'
 #rspec = 'jruby -S bundle exec /Users/andrew/dev/jruby-1.5.6/bin/spec'
-rspec = 'bundle exec rspec'
+rspec = 'bundle exec rspec -fd'
 #rspec = 'vendor/plugins/rspec/bin/spec'
 vows = 'vows --spec'
 
