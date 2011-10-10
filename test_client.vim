@@ -4,6 +4,7 @@ ruby << EOF
 cucumber = 'CUCUMBER_FORMAT=pretty bundle exec cucumber -r features'
 #rspec = 'jruby -S bundle exec /Users/andrew/dev/jruby-1.5.6/bin/spec'
 rspec = 'bundle exec rspec -fd'
+rspec_no_rails = "#{ENV['HOME']}/.rvm/rubies/ree-1.8.7-2011.03/bin/ruby -S rspec -I spec_no_rails -fd"
 #rspec = 'vendor/plugins/rspec/bin/spec'
 vows = 'vows --spec'
 
@@ -27,6 +28,16 @@ endfunction
 
 function! RunTest()
 ruby << EOF
+  def spec_filename(filename, type = 'spec')
+    filename.
+      gsub('app/helpers', "#{type}/helpers").
+      gsub('lib', "#{type}/lib").
+      gsub('app/models', "#{type}/models").
+      gsub('app/controllers', "#{type}/controllers").
+      gsub('app/mailers', "#{type}/mailers").
+      gsub('.rb', '_spec.rb')
+  end
+
   buffer = VIM::Buffer.current
   filename = buffer.name
   extname = File.extname(buffer.name)
@@ -34,6 +45,8 @@ ruby << EOF
   basename = File.basename(filename)
   command = if extname.strip == '.feature'
               then "#{cucumber} #{filename}"
+            elsif filename =~ /spec_no_rails/
+              then "#{rspec_no_rails} #{filename}"
             elsif filename =~ /_spec\.rb/
               then "#{rspec} #{filename}"
             elsif extname.strip == '.js'
@@ -41,23 +54,27 @@ ruby << EOF
             elsif filename =~ /html\.erb$/
               then "#{rspec} #{filename.sub('app/views', 'spec/views')}_spec.rb"
             else
-              spec_filename = filename.
-                gsub('app/helpers', 'spec/helpers').
-                gsub('lib', 'spec/lib').
-                gsub('app/models', 'spec/models').
-                gsub('app/controllers', 'spec/controllers').
-                gsub('app/mailers', 'spec/mailers').
-                gsub('.rb', '_spec.rb')
-              "#{rspec} #{spec_filename}"
+              spec_filename = spec_filename(filename)
+              spec_no_rails_filename = spec_filename(filename, 'spec_no_rails')
+
+              if File.exists?(spec_no_rails_filename)
+                "#{rspec_no_rails} #{spec_no_rails_filename}"
+              else
+                "#{rspec} #{spec_filename}"
+              end
             end
-  send_to_test_server(command)
+  send_to_test_server("time #{command}")
 EOF
 endfunction
 
 function! RunExample()
 ruby << EOF
   buffer = VIM::Buffer.current
-  send_to_test_server("#{rspec} -l #{buffer.line_number} #{buffer.name}")
+  if filename =~ /spec_no_rails/
+    send_to_test_server("#{rspec_no_rails} -l #{buffer.line_number} #{buffer.name}")
+  else
+    send_to_test_server("#{rspec} -l #{buffer.line_number} #{buffer.name}")
+  end
 EOF
 endfunction
 
