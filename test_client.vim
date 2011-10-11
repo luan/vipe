@@ -70,7 +70,7 @@ endfunction
 function! RunExample()
 ruby << EOF
   buffer = VIM::Buffer.current
-  if filename =~ /spec_no_rails/
+  if buffer.name =~ /spec_no_rails/
     send_to_test_server("#{rspec_no_rails} -l #{buffer.line_number} #{buffer.name}")
   else
     send_to_test_server("#{rspec} -l #{buffer.line_number} #{buffer.name}")
