@@ -1,10 +1,10 @@
 ruby << EOF
 
 #cucumber = 'jruby -S bundle exec /Users/andrew/dev/jruby-1.5.6/bin/cucumber'
-cucumber = 'CUCUMBER_FORMAT=pretty bundle exec cucumber -r features'
+cucumber = 'bundle exec cucumber -f pretty -r features'
 #rspec = 'jruby -S bundle exec /Users/andrew/dev/jruby-1.5.6/bin/spec'
-rspec = 'bundle exec rspec -fd'
-rspec_no_rails = "#{ENV['HOME']}/.rvm/rubies/ree-1.8.7-2011.03/bin/ruby -S rspec -I spec_no_rails -fd"
+rspec = 'bundle exec rspec'
+rspec_no_rails = "bundle exec rspec -I spec_no_rails"
 #rspec = 'vendor/plugins/rspec/bin/spec'
 vows = 'vows --spec'
 
@@ -30,6 +30,8 @@ function! RunTest()
 ruby << EOF
   def spec_filename(filename, type = 'spec')
     filename.
+      gsub(/app\/assets\/javascripts\/(.*)\.(?:coffee|js)$/, 'spec/javascripts/\1_spec.coffee').
+      gsub(/lib\/(.*)\.(?:coffee|js)$/, 'spec/javascripts/\1_spec.coffee').
       gsub('app/helpers', "#{type}/helpers").
       gsub('lib', "#{type}/lib").
       gsub('app/models', "#{type}/models").
@@ -44,15 +46,19 @@ ruby << EOF
   dir = File.dirname(filename)
   basename = File.basename(filename)
   command = if extname.strip == '.feature'
-              then "#{cucumber} #{filename}"
+              "#{cucumber} #{filename}"
             elsif filename =~ /spec_no_rails/
-              then "#{rspec_no_rails} #{filename}"
+              "#{rspec_no_rails} #{filename}"
             elsif filename =~ /_spec\.rb/
-              then "#{rspec} #{filename}"
-            elsif extname.strip == '.js'
-              then "cd #{dir} && #{vows} #{basename}"
+              "#{rspec} #{filename}"
+            elsif %w(.coffee .js).include?(extname.strip)
+              if File.exists?('spec/javascripts')
+                "jasmine-headless-webkit #{spec_filename(filename)}"
+              else
+                "jasmine-headless-webkit -j spec/support/jasmine.yml #{spec_filename(filename)}"
+              end
             elsif filename =~ /html\.erb$/
-              then "#{rspec} #{filename.sub('app/views', 'spec/views')}_spec.rb"
+              "#{rspec} #{filename.sub('app/views', 'spec/views')}_spec.rb"
             else
               spec_filename = spec_filename(filename)
               spec_no_rails_filename = spec_filename(filename, 'spec_no_rails')
