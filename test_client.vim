@@ -1,4 +1,5 @@
 au BufRead,BufNewFile *_spec.rb set filetype=rspec
+au BufRead,BufNewFile *_spec.rb set syntax=ruby
 
 if !exists("g:testserverpipe")
   let g:testserverpipe = $HOME . "/test_server_pipe"
