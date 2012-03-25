@@ -29,8 +29,7 @@ function! RunTest()
 endfunction
 
 function! RunTestLine()
-  let l:testtypes = keys(g:testcmdfortesttypes)
-  if index(l:testtypes, &ft) > -1
+  if has_key(g:testcmdfortesttypes, &ft)
     call s:SendToTestServer(s:AppropriateTestFilename() . ':' . line('.'))
   else
     echom "Focused test doesn't make sense (not in a test)."
