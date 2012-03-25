@@ -31,13 +31,13 @@ save-and-run-line
 Say you wanted to add the ability to run JavaScript testing with
 jasmine-headless-webkit. You'd want to add a new test command for a test type:
 
-:let g:testcmdfortesttypes.javascript = 'jasmine-headless-webkit'
+    :let g:testcmdfortesttypes.javascript = 'jasmine-headless-webkit'
 
 If you also wanted to run tests from an associated source file, and if your
 source JavaScript files were in public/javascripts, you'd do:
 
-:let g:testcmdforsrctypes.javascript = 'jasmine-headless-webkit'
-:call add(g:nontestfilereplacements, ['public/javascripts/', 'spec/javascripts/'])
+    :let g:testcmdforsrctypes.javascript = 'jasmine-headless-webkit'
+    :call add(g:nontestfilereplacements, ['public/javascripts/', 'spec/javascripts/'])
 
 The second line is only necessary if your JavaScript files aren't in
 app/javascripts.
