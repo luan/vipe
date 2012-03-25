@@ -32,7 +32,7 @@ function! RunTestLine()
   if index(l:testtypes, &ft) > -1
     call s:SendToTestServer(s:AppropriateTestFilename() . ':' . line('.'))
   else
-    echom "Focused test doesn't make sense, (not in a test)."
+    echom "Focused test doesn't make sense (not in a test)."
   endif
 endfunction
 
