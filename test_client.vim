@@ -1,96 +1,67 @@
+au BufRead,BufNewFile *_spec.rb set filetype=rspec
+
 if !exists("g:testserverpipe")
   let g:testserverpipe = $HOME . "/test_server_pipe"
 endif
-function! SendToTestServer(command)
+
+if !exists("g:testcmdfortesttypes")
+  let g:testcmdfortesttypes = {
+        \ 'rspec': 'bundle exec rspec',
+        \ 'cucumber': 'bundle exec cucumber',
+        \}
+endif
+
+if !exists("g:testcmdforsrctypes")
+  let g:testcmdforsrctypes = {
+        \ 'ruby': 'bundle exec rspec',
+        \}
+endif
+
+let g:nontestfilenamereplacements = [
+      \ ['lib/', 'spec/lib/'],
+      \ ['app/', 'spec/'],
+      \ ['.rb', '_spec.rb']
+      \]
+
+function! RunTest()
+  call s:SendToTestServer(s:AppropriateTestFilename())
+endfunction
+
+function! RunTestLine()
+  let l:testtypes = keys(g:testcmdfortesttypes)
+  if index(l:testtypes, &ft) > -1
+    call s:SendToTestServer(s:AppropriateTestFilename() . ':' . line('.'))
+  else
+    echom "Focused test doesn't make sense, (not in a test)."
+  endif
+endfunction
+
+function! s:AppropriateTestFilename()
+  let l:filename = expand('%')
+
+  if has_key(g:testcmdfortesttypes, &ft)
+    return g:testcmdfortesttypes[&ft] . ' ' . l:filename
+  else
+    return g:testcmdforsrctypes[&ft] . ' ' . s:TestFilenameFor(l:filename)
+  endif
+endfunction
+
+function! s:SendToTestServer(command)
   call writefile([a:command], g:testserverpipe)
   echom "Sent " . a:command
 endfunction
 
-ruby << EOF
-
-#cucumber = 'jruby -S bundle exec /Users/andrew/dev/jruby-1.5.6/bin/cucumber'
-cucumber = 'bundle exec cucumber -f pretty -r features'
-#rspec = 'jruby -S bundle exec /Users/andrew/dev/jruby-1.5.6/bin/spec'
-rspec = 'bundle exec rspec'
-rspec_no_rails = "bundle exec rspec -I spec_no_rails"
-#rspec = 'vendor/plugins/rspec/bin/spec'
-vows = 'vows --spec'
-
-def send_to_test_server(command)
-  File.open(File.join(ENV['HOME'], 'test_server_pipe'), 'w+') do |pipe|
-    pipe.puts command
-    pipe.flush
-  end
-  print "Sent #{command}"
-end
-EOF
-
-function! RunScenario(scenario)
-ruby << EOF
-  buffer = VIM::Buffer.current
-  filename = buffer.name
-  command = "#{cucumber} #{buffer.name} --name '#{VIM::evaluate('a:scenario')}'"
-  VIM::command("call SendToTestServer('#{command}')")
-EOF
+function! s:TestFilenameFor(srcfilename)
+  return s:MultiSubString(a:srcfilename, g:nontestfilenamereplacements)
 endfunction
 
-function! RunTest()
-ruby << EOF
-  def spec_filename(filename, type = 'spec')
-    filename.
-      gsub(/app\/assets\/javascripts\/(.*)\.(?:coffee|js)$/, 'spec/javascripts/\1_spec.coffee').
-      gsub(/lib\/(.*)\.(?:coffee|js)$/, 'spec/javascripts/\1_spec.coffee').
-      gsub('app/helpers', "#{type}/helpers").
-      gsub('lib', "#{type}/lib").
-      gsub('app/models', "#{type}/models").
-      gsub('app/controllers', "#{type}/controllers").
-      gsub('app/mailers', "#{type}/mailers").
-      gsub('.rb', '_spec.rb')
-  end
+function! s:MultiSubString(string, substitutions)
+  let l:substituted = substitute(a:string, a:substitutions[0][0], a:substitutions[0][1], '')
 
-  buffer = VIM::Buffer.current
-  filename = buffer.name
-  extname = File.extname(buffer.name)
-  dir = File.dirname(filename)
-  basename = File.basename(filename)
-  command = if extname.strip == '.feature'
-              "#{cucumber} #{filename}"
-            elsif filename =~ /spec_no_rails/
-              "#{rspec_no_rails} #{filename}"
-            elsif filename =~ /_spec\.rb/
-              "#{rspec} #{filename}"
-            elsif %w(.coffee .js).include?(extname.strip)
-              if File.exists?('spec/javascripts')
-                "jasmine-headless-webkit #{spec_filename(filename)}"
-              else
-                "jasmine-headless-webkit -j spec/support/jasmine.yml #{spec_filename(filename)}"
-              end
-            elsif filename =~ /html\.erb$/
-              "#{rspec} #{filename.sub('app/views', 'spec/views')}_spec.rb"
-            else
-              spec_filename = spec_filename(filename)
-              spec_no_rails_filename = spec_filename(filename, 'spec_no_rails')
-
-              if File.exists?(spec_no_rails_filename)
-                "#{rspec_no_rails} #{spec_no_rails_filename}"
-              else
-                "#{rspec} #{spec_filename}"
-              end
-            end
-  VIM::command("call SendToTestServer('#{command}')")
-EOF
-endfunction
-
-function! RunExample()
-ruby << EOF
-  buffer = VIM::Buffer.current
-  if buffer.name =~ /spec_no_rails/
-    command = "#{rspec_no_rails} -l #{buffer.line_number} #{buffer.name}"
-    VIM::command("call SendToTestServer('#{command}')")
+  if len(a:substitutions) == 1
+    return l:substituted
   else
-    command = "#{rspec} -l #{buffer.line_number} #{buffer.name}"
-    VIM::command("call SendToTestServer('#{command}')")
-  end
-EOF
+    return s:MultiSubString(l:substituted, a:substitutions[1:-1])
+  endif
 endfunction
 
