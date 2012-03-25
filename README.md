@@ -13,6 +13,7 @@ editing, or anything you like with whatever you throw at the named pipe.
 * Run test_server.rb in a terminal
 * Fire up Vim and open a model, controller, spec or feature file.
 * Type ':call RunTest()' or ':call RunTestLine()' for example under line
+* See your test run in the console you ran the server in
 * ???
 * Eat flapjacks
 
@@ -42,6 +43,8 @@ source JavaScript files were in public/javascripts, you'd do:
 The second line is only necessary if your JavaScript files aren't in
 app/javascripts.
 
-Make sure you change the globals after the plugin has been loaded.
-Alternatively, crack open the test_client.vim file and edit the globals to
-taste.
+For the above differential technique, make sure you change the globals after
+the plugin has been loaded.
+
+Alternatively, exhaustively set these globals before the plugin is loaded, or
+crack open the test_client.vim file and edit the globals to taste.
