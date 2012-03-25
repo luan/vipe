@@ -1,3 +1,11 @@
+if !exists("g:testserverpipe")
+  let g:testserverpipe = $HOME . "/test_server_pipe"
+endif
+function! SendToTestServer(command)
+  call writefile([a:command], g:testserverpipe)
+  echom "Sent " . a:command
+endfunction
+
 ruby << EOF
 
 #cucumber = 'jruby -S bundle exec /Users/andrew/dev/jruby-1.5.6/bin/cucumber'
@@ -22,7 +30,7 @@ ruby << EOF
   buffer = VIM::Buffer.current
   filename = buffer.name
   command = "#{cucumber} #{buffer.name} --name '#{VIM::evaluate('a:scenario')}'"
-  send_to_test_server(command)
+  VIM::command("call SendToTestServer('#{command}')")
 EOF
 endfunction
 
@@ -69,7 +77,7 @@ ruby << EOF
                 "#{rspec} #{spec_filename}"
               end
             end
-  send_to_test_server("time #{command}")
+  VIM::command("call SendToTestServer('#{command}')")
 EOF
 endfunction
 
@@ -77,9 +85,11 @@ function! RunExample()
 ruby << EOF
   buffer = VIM::Buffer.current
   if buffer.name =~ /spec_no_rails/
-    send_to_test_server("#{rspec_no_rails} -l #{buffer.line_number} #{buffer.name}")
+    command = "#{rspec_no_rails} -l #{buffer.line_number} #{buffer.name}"
+    VIM::command("call SendToTestServer('#{command}')")
   else
-    send_to_test_server("#{rspec} -l #{buffer.line_number} #{buffer.name}")
+    command = "#{rspec} -l #{buffer.line_number} #{buffer.name}"
+    VIM::command("call SendToTestServer('#{command}')")
   end
 EOF
 endfunction
