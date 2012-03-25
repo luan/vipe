@@ -29,7 +29,7 @@ function! RunTest()
 endfunction
 
 function! RunTestLine()
-  if has_key(g:testcmdfortesttypes, &ft)
+  if s:InTestFile()
     call s:SendToTestServer(s:AppropriateTestFilename() . ':' . line('.'))
   else
     echom "Focused test doesn't make sense (not in a test)."
@@ -39,10 +39,10 @@ endfunction
 function! s:AppropriateTestFilename()
   let l:filename = expand('%')
 
-  if has_key(g:testcmdfortesttypes, &ft)
+  if s:InTestFile()
     return g:testcmdfortesttypes[&ft] . ' ' . l:filename
   else
-    return g:testcmdforsrctypes[&ft] . ' ' . s:TestFilenameFor(l:filename)
+    return g:testcmdforsrctypes[&ft] . ' ' . s:AssociatedTestFilename(l:filename)
   endif
 endfunction
 
@@ -51,7 +51,11 @@ function! s:SendToTestServer(command)
   echom "Sent " . a:command
 endfunction
 
-function! s:TestFilenameFor(srcfilename)
+function! s:InTestFile()
+  return has_key(g:testcmdfortesttypes, &ft)
+endfunction
+
+function! s:AssociatedTestFilename(srcfilename)
   return s:MultiSubString(a:srcfilename, g:nontestfilenamereplacements)
 endfunction
 
