@@ -1,24 +1,24 @@
 au BufRead,BufNewFile *_spec.rb set filetype=rspec
 au BufRead,BufNewFile *_spec.rb set syntax=ruby
 
-if !exists("g:testserverpipe")
-  let g:testserverpipe = $HOME . "/test_server_pipe"
+if !exists("g:test_server_pipe")
+  let g:test_server_pipe = $HOME . "/test_server_pipe"
 endif
 
-if !exists("g:testcmdfortesttypes")
-  let g:testcmdfortesttypes = {
+if !exists("g:test_cmd_for_test_types")
+  let g:test_cmd_for_test_types = {
         \ 'rspec': 'bundle exec rspec',
         \ 'cucumber': 'bundle exec cucumber',
         \}
 endif
 
-if !exists("g:testcmdforsrctypes")
-  let g:testcmdforsrctypes = {
+if !exists("g:test_cmd_for_src_types")
+  let g:test_cmd_for_src_types = {
         \ 'ruby': 'bundle exec rspec',
         \}
 endif
 
-let g:nontestfilenamereplacements = [
+let g:non_test_filename_replacements = [
       \ ['lib/', 'spec/lib/'],
       \ ['app/', 'spec/'],
       \ ['.rb', '_spec.rb']
@@ -40,23 +40,23 @@ function! s:AppropriateTestFilename()
   let l:filename = expand('%')
 
   if s:InTestFile()
-    return g:testcmdfortesttypes[&ft] . ' ' . l:filename
+    return g:test_cmd_for_test_types[&ft] . ' ' . l:filename
   else
-    return g:testcmdforsrctypes[&ft] . ' ' . s:AssociatedTestFilename(l:filename)
+    return g:test_cmd_for_src_types[&ft] . ' ' . s:AssociatedTestFilename(l:filename)
   endif
 endfunction
 
 function! s:SendToTestServer(command)
-  call writefile([a:command], g:testserverpipe)
+  call writefile([a:command], g:test_server_pipe)
   echom "Sent " . a:command
 endfunction
 
 function! s:InTestFile()
-  return has_key(g:testcmdfortesttypes, &ft)
+  return has_key(g:test_cmd_for_test_types, &ft)
 endfunction
 
-function! s:AssociatedTestFilename(srcfilename)
-  return s:MultiSubString(a:srcfilename, g:nontestfilenamereplacements)
+function! s:AssociatedTestFilename(src_filename)
+  return s:MultiSubString(a:src_filename, g:non_test_filename_replacements)
 endfunction
 
 function! s:MultiSubString(string, substitutions)
