@@ -24,13 +24,17 @@ let g:non_test_filename_replacements = [
       \ ['.rb', '_spec.rb']
       \]
 
-fun! RunTest()
+command! RunTest call s:RunTest()
+command! RunTestLine call s:RunTestLine()
+command! RunTestAgain call s:RunTestAgain()
+
+function! s:RunTest()
 if s:TestIsExecutable()
   call s:SendToTestServer(s:AppropriateTestFilename())
 endif
 endf
 
-fun! RunTestLine()
+function! s:RunTestLine()
 if s:InTestFile()
   call s:SendToTestServer(s:AppropriateTestFilename() . ':' . line('.'))
 else
@@ -38,7 +42,15 @@ else
 endif
 endf
 
-fun! s:AppropriateTestFilename()
+function! s:RunTestAgain()
+if exists("s:last_test_run")
+  call s:SendToTestServer(s:last_test_run)
+else
+  echom "No previous test run"
+endif
+endf
+
+function! s:AppropriateTestFilename()
 let l:filename = expand('%')
 
 if s:InTestFile()
@@ -48,28 +60,29 @@ else
 endif
 endf
 
-fun! s:SendToTestServer(command)
+function! s:SendToTestServer(command)
 call writefile([a:command], g:test_server_pipe)
 echom "Sent " . a:command
+let s:last_test_run = a:command
 endf
 
-fun! s:InTestFile()
+function! s:InTestFile()
 return has_key(g:test_cmd_for_test_types, &ft)
 endf
 
-fun! s:InSrcFile()
+function! s:InSrcFile()
 return has_key(g:test_cmd_for_src_types, &ft)
 endf
 
-fun! s:TestIsExecutable()
+function! s:TestIsExecutable()
 return s:InTestFile() || s:InSrcFile()
 endf
 
-fun! s:AssociatedTestFilename(src_filename)
+function! s:AssociatedTestFilename(src_filename)
 return s:MultiSubString(a:src_filename, g:non_test_filename_replacements)
 endf
 
-fun! s:MultiSubString(string, substitutions)
+function! s:MultiSubString(string, substitutions)
 let l:substituted = substitute(a:string, a:substitutions[0][0], a:substitutions[0][1], '')
 
 if len(a:substitutions) == 1
