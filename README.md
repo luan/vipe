@@ -12,20 +12,22 @@ editing, or anything you like with whatever you throw at the named pipe.
 * Install into your ~/.vim/bundle (assuming you use Pathogen)
 * Run test_server.rb in a terminal
 * Fire up Vim and open a model, controller, spec or feature file.
-* Type ':call RunTest()' or ':call RunTestLine()' for example under line
+* Type ':RunTest' or ':RunTestLine' for example under line, ':RunTestAgain' for previous run
 * See your test run in the console you ran the server in
 * ???
 * Eat flapjacks
 
 I recommend binding functions to keys, for example:
 
-    map <F12> :w<CR>:call RunTest()<CR>
-    imap <F12> <ESC><F12><CR>
-    map <F11> :w<CR>:call RunTestLine()<CR>
-    imap <F11> <ESC><F11><CR>
+    map <F12> :w<CR>:RunTest<CR>
+    imap <F12> <ESC><F12>
+    map <F11> :w<CR>:RunTestLine<CR>
+    imap <F11> <ESC><F11>
+    map <F10> :w<CR>:RunTestAgain<CR>
+    imap <F10> <ESC><F10>
 
-In your ~/.vimrc will bind F12 to save-and-run-test and F11 to
-save-and-run-line
+In your ~/.vimrc will bind F12 to save-and-run-test, F11 to
+save-and-run-line and F10 to run-previous-test-again.
 
 ## Further configuration
 
