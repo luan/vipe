@@ -5,16 +5,16 @@ if !exists("g:test_server_pipe")
   let g:test_server_pipe = $HOME . "/test_server_pipe"
 endif
 
-if !exists("g:test_cmd_for_test_types")
-  let g:test_cmd_for_test_types = {
-        \ 'rspec': 'bundle exec rspec',
-        \ 'cucumber': 'bundle exec cucumber',
+if !exists("g:test_cmd_for_test_pattern")
+  let g:test_cmd_for_test_pattern = {
+        \ '_spec.rb$': 'bundle exec rspec',
+        \ '\.feature$': 'bundle exec cucumber',
         \}
 endif
 
-if !exists("g:test_cmd_for_src_types")
-  let g:test_cmd_for_src_types = {
-        \ 'ruby': 'bundle exec rspec',
+if !exists("g:test_cmd_for_src_pattern")
+  let g:test_cmd_for_src_pattern = {
+        \ '\.rb$': 'bundle exec rspec',
         \}
 endif
 
@@ -54,9 +54,9 @@ function! s:AppropriateTestFilename()
 let l:filename = expand('%')
 
 if s:InTestFile()
-  return g:test_cmd_for_test_types[&ft] . ' ' . l:filename
-else
-  return g:test_cmd_for_src_types[&ft] . ' ' . s:AssociatedTestFilename(l:filename)
+  return s:CommandForTestFile() . ' ' . l:filename
+elseif s:InSrcFile()
+  return s:CommandForSrcFile() . ' ' . s:AssociatedTestFilename(l:filename)
 endif
 endf
 
@@ -66,12 +66,36 @@ echom "Sent " . a:command
 let s:last_test_run = a:command
 endf
 
+function! s:CommandForTestFile()
+for pattern in keys(g:test_cmd_for_test_pattern)
+  if match(expand('%'), pattern) > -1
+    return g:test_cmd_for_test_pattern[pattern]
+  endif
+endfor
+endf
+
+function! s:CommandForSrcFile()
+for pattern in keys(g:test_cmd_for_src_pattern)
+  if match(expand('%'), pattern) > -1
+    return g:test_cmd_for_src_pattern[pattern]
+  endif
+endfor
+endf
+
 function! s:InTestFile()
-return has_key(g:test_cmd_for_test_types, &ft)
+for pattern in keys(g:test_cmd_for_test_pattern)
+  if match(expand('%'), pattern) > -1
+    return 1
+  endif
+endfor
 endf
 
 function! s:InSrcFile()
-return has_key(g:test_cmd_for_src_types, &ft)
+for pattern in keys(g:test_cmd_for_src_pattern)
+  if match(expand('%'), pattern) > -1
+    return 1
+  endif
+endfor
 endf
 
 function! s:TestIsExecutable()
