@@ -51,9 +51,9 @@ function! s:AppropriateTestFilename()
 let l:filename = expand('%')
 
 if s:InTestFile()
-  return s:CommandForTestFile() . ' ' . l:filename
+  return s:GetCommand(g:test_cmd_for_test_pattern) . ' ' . l:filename
 elseif s:InSrcFile()
-  return s:CommandForSrcFile() . ' ' . s:AssociatedTestFilename(l:filename)
+  return s:GetCommand(g:test_cmd_for_src_pattern) . ' ' . s:AssociatedTestFilename(l:filename)
 endif
 endf
 
@@ -63,25 +63,17 @@ echom "Sent " . a:command
 let s:last_test_run = a:command
 endf
 
-function! s:CommandForTestFile()
-for pattern in keys(g:test_cmd_for_test_pattern)
-  if match(expand('%'), pattern) > -1
-    return g:test_cmd_for_test_pattern[pattern]
-  endif
-endfor
-endf
-
-function! s:CommandForSrcFile()
-for pattern in keys(g:test_cmd_for_src_pattern)
-  if match(expand('%'), pattern) > -1
-    return g:test_cmd_for_src_pattern[pattern]
+function! s:GetCommand(dict)
+for pattern in keys(a:dict)
+  if s:CurrentFileMatches(pattern)
+    return a:dict[pattern]
   endif
 endfor
 endf
 
 function! s:InTestFile()
 for pattern in keys(g:test_cmd_for_test_pattern)
-  if match(expand('%'), pattern) > -1
+  if s:CurrentFileMatches(pattern)
     return 1
   endif
 endfor
@@ -89,10 +81,14 @@ endf
 
 function! s:InSrcFile()
 for pattern in keys(g:test_cmd_for_src_pattern)
-  if match(expand('%'), pattern) > -1
+  if s:CurrentFileMatches(pattern)
     return 1
   endif
 endfor
+endf
+
+function! s:CurrentFileMatches(pattern)
+return match(expand('%'), a:pattern) > -1
 endf
 
 function! s:TestIsExecutable()
