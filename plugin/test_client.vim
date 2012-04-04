@@ -15,11 +15,13 @@ if !exists("g:test_cmd_for_src_pattern")
         \}
 endif
 
-let g:non_test_filename_replacements = [
-      \ ['lib/', 'spec/lib/'],
-      \ ['app/', 'spec/'],
-      \ ['.rb', '_spec.rb']
-      \]
+if !exists("g:non_test_filename_replacements")
+  let g:non_test_filename_replacements = [
+        \ ['lib/', 'spec/lib/'],
+        \ ['app/', 'spec/'],
+        \ ['.rb', '_spec.rb']
+        \]
+endif
 
 command! RunTest call s:RunTest()
 command! RunTestLine call s:RunTestLine()
