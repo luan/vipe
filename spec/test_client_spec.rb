@@ -48,37 +48,45 @@ describe "test_client.vim" do
     vim.edit path
   end
 
-  shared_examples_for "the whole spec is run" do
-    context "(shared)" do
-      let(:spec_filename) { 'example_spec.rb' }
-      before { edit filename }
+  shared_examples_for "a test run" do
+    it "sends the VIM server name as an environment variable" do
+      pattern = /^VIM_SERVER="VIMRUNNER.*" /
+      run_test.should_not =~ pattern
+      pipe.should =~ pattern
+    end
+  end
 
-      it "sends the spec file path to the pipe" do
-        run_test
-        pipe.should =~ /rspec/
-        pipe.should =~ /#{spec_filename}$/
-      end
+  shared_examples_for "a whole spec run" do
+    let(:spec_filename) { 'example_spec.rb' }
+    before { edit filename }
 
-      it "shows an appropriate message" do
-        run_test.should =~ /#{spec_filename}/
-      end
+    it_behaves_like "a test run"
+
+    it "sends the spec file path to the pipe" do
+      run_test
+      pipe.should =~ /rspec/
+      pipe.should =~ /#{spec_filename}$/
+    end
+
+    it "shows an appropriate message" do
+      run_test.should =~ /#{spec_filename}/
     end
   end
 
   shared_examples_for "the whole feature is run" do
-    context "(shared)" do
-      let(:feature_filename) { 'example.feature' }
-      before { edit filename }
+    let(:feature_filename) { 'example.feature' }
+    before { edit filename }
 
-      it "sends the feature file path to the pipe" do
-        run_test
-        pipe.should =~ /cucumber/
-        pipe.should =~ /#{feature_filename}$/
-      end
+    it_behaves_like "a test run"
 
-      it "shows an appropriate message" do
-        run_test.should =~ /#{feature_filename}/
-      end
+    it "sends the feature file path to the pipe" do
+      run_test
+      pipe.should =~ /cucumber/
+      pipe.should =~ /#{feature_filename}$/
+    end
+
+    it "shows an appropriate message" do
+      run_test.should =~ /#{feature_filename}/
     end
   end
 
@@ -91,7 +99,7 @@ describe "test_client.vim" do
 
   describe "running a whole spec from the spec file" do
     let(:filename) { 'example_spec.rb' }
-    it_behaves_like "the whole spec is run"
+    it_behaves_like "a whole spec run"
   end
 
   describe "running a whole feature from the feature file" do
@@ -101,7 +109,7 @@ describe "test_client.vim" do
 
   describe "running a whole spec from the source file" do
     let(:filename) { 'example.rb' }
-    it_behaves_like "the whole spec is run"
+    it_behaves_like "a whole spec run"
   end
 
   describe "running a line spec focused to a line from the spec file" do

@@ -60,7 +60,8 @@ endif
 endf
 
 function! s:SendToTestServer(command)
-call writefile([a:command], g:test_server_pipe)
+let command_with_server_name = 'VIM_SERVER="' . v:servername . '" ' . a:command
+call writefile([command_with_server_name], g:test_server_pipe)
 echom "Sent " . a:command
 let s:last_test_run = a:command
 endf
