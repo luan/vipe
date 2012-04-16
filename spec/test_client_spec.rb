@@ -48,13 +48,6 @@ describe "test_client.vim" do
     vim.edit path
   end
 
-  describe "running when there is no file open" do
-    it "does not send anything to the pipe" do
-      run_test
-      pipe.should == ''
-    end
-  end
-
   shared_examples_for "the whole spec is run" do
     context "(shared)" do
       let(:spec_filename) { 'example_spec.rb' }
@@ -86,6 +79,13 @@ describe "test_client.vim" do
       it "shows an appropriate message" do
         run_test.should =~ /#{feature_filename}/
       end
+    end
+  end
+
+  describe "running when there is no file open" do
+    it "does not send anything to the pipe" do
+      run_test
+      pipe.should == ''
     end
   end
 
