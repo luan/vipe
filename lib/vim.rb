@@ -1,0 +1,2 @@
+class Vim
+end
