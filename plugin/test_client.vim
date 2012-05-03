@@ -26,6 +26,7 @@ endif
 command! RunTest call s:RunTest()
 command! RunTestLine call s:RunTestLine()
 command! RunTestAgain call s:RunTestAgain()
+command! RunTestPrevious call s:RunTestPrevious()
 
 function! s:RunTest()
 if s:TestIsExecutable()
@@ -49,6 +50,14 @@ else
 endif
 endf
 
+function! s:RunTestPrevious()
+if exists("s:previous_test_run")
+  call s:SendToTestServer(s:previous_test_run)
+else
+  echom "No previous test run"
+endif
+endf
+
 function! s:AppropriateTestFilename()
 let l:filename = expand('%')
 
@@ -60,6 +69,7 @@ endif
 endf
 
 function! s:SendToTestServer(command)
+let s:previous_test_run = s:last_test_run
 call writefile([a:command], g:test_server_pipe)
 echom "Sent " . a:command
 let s:last_test_run = a:command

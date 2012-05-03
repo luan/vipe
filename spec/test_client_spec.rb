@@ -44,6 +44,10 @@ describe "test_client.vim" do
     vim.command "RunTestAgain"
   end
 
+  def run_previous
+    vim.command 'RunTestPrevious'
+  end
+
   def edit(path)
     vim.edit path
   end
@@ -155,6 +159,26 @@ describe "test_client.vim" do
       run_again
       pipe.should =~ /rspec/
       pipe.should =~ /file2_spec\.rb$/
+    end
+  end
+
+  describe "running previous test" do
+    context "when previous test was run" do
+      it "runs appropriate test" do
+        edit "file1_spec.rb"
+        run_test
+        edit "file2_spec.rb"
+        run_test
+        run_previous
+        pipe.should =~ /rspec/
+        pipe.should =~ /file1_spec\.rb$/
+      end
+    end
+
+    context "when no previous test was run" do
+      it "displays an error" do
+        run_previous.should =~ /No previous/
+      end
     end
   end
 end
