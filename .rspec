@@ -1,4 +1,5 @@
 --color
 --debugger
 --order random
--fd
+--format RspecQuickfixFormatter
+--format documentation

@@ -4,7 +4,7 @@ class QuickfixList
   end
 
   def add(path, line, text)
-    @vim.caddexpr("#{path}:#{line}:#{text}")
+    @vim.caddexpr [path, line, text].join(':')
   end
 
   def clear

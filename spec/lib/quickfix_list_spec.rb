@@ -9,6 +9,7 @@ describe QuickfixList do
 
   describe "clearing the list" do
     it "sends a cexpr with an empty argument to Vim" do
+      aw
       vim.should_receive(:cexpr).with("")
       subject.clear
     end

@@ -1,24 +1,29 @@
 require 'rspec_quickfix_formatter'
 
-describe RSpecQuickfixFormatter do
+describe RspecQuickfixFormatter do
   class StubExampleGroup < RSpec::Core::ExampleGroup; end
 
   let(:quickfix_list) { double 'quickfix list', add: nil, clear: nil }
   let(:formatter) do
-    RSpecQuickfixFormatter.new(quickfix_list: quickfix_list)
+    RspecQuickfixFormatter.new('', quickfix_list: quickfix_list)
   end
 
   it "uses defaults for all instances" do
     vim = double 'vim'
+    shell = double 'shell'
 
     ENV.should_receive(:[]).with('VIM_SERVER').and_return('SOMESERVER')
 
-    Vim.should_receive(:new).
-      with(server_name: 'SOMESERVER').
-      and_return(vim)
+    Shell.stub(:new).and_return(shell)
+
+    Vim.should_receive(:new).with(
+      server_name: 'SOMESERVER',
+      shell: shell,
+      executable: 'mvim'
+    ).and_return(vim)
 
     QuickfixList.should_receive(:new).with(vim: vim)
-    RSpecQuickfixFormatter.new
+    RspecQuickfixFormatter.new('')
   end
 
   before do
@@ -27,7 +32,7 @@ describe RSpecQuickfixFormatter do
   end
 
   let(:description) { "makes coffee" }
-  let(:full_description) { "when button pressed #{description}" }
+  let(:exception) { "something bad happened\nand there were many lines" }
   let(:line_number) { 21 }
   let(:path) { '/full/path/to/toffee_apples_spec.rb' }
 
@@ -39,10 +44,9 @@ describe RSpecQuickfixFormatter do
     {
       file_path: path,
       description: description,
-      full_description: full_description,
       line_number: line_number,
       execution_result: {
-        exception: "something bad happened"
+        exception: Exception.new(exception)
       }
     }
   end
@@ -54,7 +58,8 @@ describe RSpecQuickfixFormatter do
     end
 
     it "adds the failed example to the quickfix list" do
-      quickfix_list.should_receive(:add).with(path, line_number, description)
+      quickfix_list.should_receive(:add).
+        with(path, line_number, "something bad happened and there were many lines")
       formatter.example_failed(example)
     end
   end
@@ -70,7 +75,8 @@ describe RSpecQuickfixFormatter do
     it "adds the second failed example to the quickfix list" do
       formatter.example_failed(example)
 
-      quickfix_list.should_receive(:add).with(path, line_number, description)
+      quickfix_list.should_receive(:add).
+        with(path, line_number, "something bad happened and there were many lines")
       formatter.example_failed(example)
     end
   end
