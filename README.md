@@ -25,9 +25,11 @@ I recommend binding commands to keys, for example:
     imap <F11> <ESC><F11>
     map <F10> :w<CR>:RunTestAgain<CR>
     imap <F10> <ESC><F10>
+    map <F9> :w<CR>:RunTestPrevious<CR>
+    imap <F9> <ESC><F9>
 
 In your ~/.vimrc will bind F12 to save-and-run-test, F11 to
-save-and-run-line and F10 to save-and-run-previous-test-again.
+save-and-run-line, F10 to save-and-run-test-again and F9 to save-and-run-previous-test.
 
 ## Further configuration
 
