@@ -69,7 +69,9 @@ endif
 endf
 
 function! s:SendToTestServer(command)
-let s:previous_test_run = s:last_test_run
+if exists("s:last_test_run")
+  let s:previous_test_run = s:last_test_run
+endif
 call writefile([a:command], g:test_server_pipe)
 echom "Sent " . a:command
 let s:last_test_run = a:command
