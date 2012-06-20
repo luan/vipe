@@ -2,26 +2,22 @@ if !exists("g:test_server_pipe")
   let g:test_server_pipe = $HOME . "/test_server_pipe"
 endif
 
-if !exists("g:test_cmd_for_test_pattern")
-  let g:test_cmd_for_test_pattern = {
-        \ '_spec.rb$': 'bundle exec rspec',
-        \ '\.feature$': 'bundle exec cucumber',
-        \}
-endif
+let g:test_cmd_for_test_pattern = {
+      \ '_spec.rb$': 'bundle exec rspec -rruby-debug',
+      \ '\.feature$': 'bundle exec cucumber',
+      \}
 
-if !exists("g:test_cmd_for_src_pattern")
-  let g:test_cmd_for_src_pattern = {
-        \ '\.rb$': 'bundle exec rspec',
-        \}
-endif
+let g:test_cmd_for_src_pattern = {
+      \ '\.rb$': 'bundle exec rspec -rruby-debug',
+      \ '\.haml$': 'bundle exec rspec -rruby-debug',
+      \}
 
-if !exists("g:non_test_filename_replacements")
-  let g:non_test_filename_replacements = [
-        \ ['lib/', 'spec/lib/'],
-        \ ['app/', 'spec/'],
-        \ ['.rb', '_spec.rb']
-        \]
-endif
+let g:non_test_filename_replacements = [
+      \ ['lib/', 'spec/lib/'],
+      \ ['app/', 'spec/'],
+      \ ['.rb', '_spec.rb'],
+      \ ['.haml', '.haml_spec.rb'],
+      \]
 
 command! RunTest call s:RunTest()
 command! RunTestLine call s:RunTestLine()

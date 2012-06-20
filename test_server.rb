@@ -11,7 +11,7 @@ File.open pipe_path, 'w+' do |file|
     command = file.gets
     system "clear"
     puts command
-    system command
+    system "time #{command}"
   end
 end
 
