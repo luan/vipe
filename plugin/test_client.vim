@@ -3,13 +3,13 @@ if !exists("g:test_server_pipe")
 endif
 
 let g:test_cmd_for_test_pattern = {
-      \ '_spec.rb$': 'bundle exec rspec -rruby-debug',
+      \ '_spec.rb$': 'bundle exec rspec',
       \ '\.feature$': 'bundle exec cucumber',
       \}
 
 let g:test_cmd_for_src_pattern = {
-      \ '\.rb$': 'bundle exec rspec -rruby-debug',
-      \ '\.haml$': 'bundle exec rspec -rruby-debug',
+      \ '\.rb$': 'bundle exec rspec',
+      \ '\.haml$': 'bundle exec rspec',
       \}
 
 let g:non_test_filename_replacements = [
