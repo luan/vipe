@@ -3,7 +3,7 @@ require 'vimrunner'
 
 describe "vipe.vim" do
   let(:vim) do
-    Vimrunner::Runner.start_vim.tap do |vim|
+    Vimrunner.start.tap do |vim|
       vim.command "source plugin/vipe.vim"
     end
   end
@@ -31,6 +31,21 @@ describe "vipe.vim" do
     clear_pipe
     pipe.should == ''
     puts vim.command 'Vipe'
+    pipe.should =~ /aloha matata/
+  end
+
+  it "has a command stack" do
+    vim.command 'Vipe aloha matata'
+    pipe.should =~ /aloha matata/
+
+    clear_pipe
+
+    vim.command 'Vipe hakuna matata'
+    pipe.should =~ /hakuna matata/
+
+    clear_pipe
+
+    vim.command 'VipePop'
     pipe.should =~ /aloha matata/
   end
 
