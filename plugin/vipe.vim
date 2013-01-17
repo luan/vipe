@@ -4,12 +4,12 @@ endif
 
 let s:command_stack = []
 
-command! -nargs=? Vipe call s:SendToPipe(<q-args>)
-command! VipePop call s:PopAndSend()
+command! -nargs=? Vipe call Vipe(<q-args>)
+command! VipePop call VipePop()
 
-function! s:SendToPipe(...)
+function! Vipe(...)
   if len(a:1) == 0
-    call s:ResendToPipe()
+    call VipeRerun()
     return
   end
 
@@ -17,10 +17,10 @@ function! s:SendToPipe(...)
   if len(s:command_stack) == 0 || s:command_stack[0] != command
     call insert(s:command_stack, command)
   end
-  call s:ResendToPipe()
+  call VipeRerun()
 endf
 
-function! s:ResendToPipe()
+function! VipeRerun()
   if len(s:command_stack) > 0
     call writefile([s:command_stack[0]], g:vipe_pipe)
     echom "Sent " . s:command_stack[0]
@@ -29,10 +29,10 @@ function! s:ResendToPipe()
   end
 endf
 
-function! s:PopAndSend()
+function! VipePop()
   if len(s:command_stack) > 0
     call remove(s:command_stack, 0)
   end
-  call s:ResendToPipe()
+  call VipeRerun()
 endf
 
