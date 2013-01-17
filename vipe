@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-pipe_path = File.join(ENV['HOME'], 'test_server_pipe')
+pipe_path = File.join(ENV['HOME'], 'vipe_pipe')
 `mkfifo #{pipe_path}` unless File.exists?(pipe_path)
 
 system "clear"
