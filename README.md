@@ -14,3 +14,7 @@ pipe with a stack.
 
 I recommend this to run tests.
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/luan/vipe/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
