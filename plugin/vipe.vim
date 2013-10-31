@@ -1,11 +1,17 @@
-if !exists("g:vipe_pipe")
-  let g:vipe_pipe = $HOME . "/vipe_pipe"
-endif
-
 let s:command_stack = []
 
 command! -nargs=? Vipe call Vipe(<q-args>)
 command! VipePop call VipePop()
+
+function! VipePipePath()
+  if !exists("g:vipe_pipe")
+    let pipe_path = $HOME . "/.vipe_pipe_" .  substitute(getcwd(), '/', '_', 'g')
+  else
+    let pipe_path = g:vipe_pipe
+  endif
+
+  return pipe_path
+endfunction
 
 function! Vipe(...)
   if len(a:1) == 0
@@ -22,7 +28,7 @@ endf
 
 function! VipeRerun()
   if len(s:command_stack) > 0
-    call writefile([s:command_stack[0]], g:vipe_pipe)
+    call writefile([s:command_stack[0]], VipePipePath())
     echom "Sent " . s:command_stack[0]
   else
     echom "No previous command ran"

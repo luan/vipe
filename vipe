@@ -1,17 +1,30 @@
 #!/usr/bin/env ruby
 
-pipe_path = File.join(ENV['HOME'], 'vipe_pipe')
+require 'fileutils'
+
+postfix = Dir.pwd.gsub('/', '_')
+pipe_path = File.join(ENV['HOME'], ".vipe_pipe_#{postfix}")
+FileUtils.rm_f pipe_path
 `mkfifo #{pipe_path}` unless File.exists?(pipe_path)
 
+def print_info(command=nil)
+  print "\x1b[1000B"
+  print "\x1b[2A"
+  puts "\x1b[33m$ #{command.chomp}\x1b[0m" if command
+  print "\x1b[34mvipe running on directory: #{Dir.pwd}\x1b[0m"
+  print "\x1b[H"
+end
+
 system "clear"
-puts "Opened pipe #{pipe_path}"
+print_info
 
 File.open pipe_path, 'w+' do |file|
   loop do
     command = file.gets
     system "clear"
-    puts command
+    print_info(command)
     system "time #{command}"
+    print_info(command)
   end
 end
 

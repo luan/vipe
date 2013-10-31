@@ -3,22 +3,36 @@ require 'vimrunner'
 
 describe "vipe.vim" do
   let(:vim) do
+    FileUtils.mkdir_p "/tmp/vipe_spec/vim1"
     Vimrunner.start.tap do |vim|
-      vim.command "source plugin/vipe.vim"
+      puts vim.command "source plugin/vipe.vim"
+      puts vim.command "cd /tmp/vipe_spec/vim1"
     end
   end
 
-  before { clear_pipe }
+  let(:other_vim) do
+    FileUtils.mkdir_p "/tmp/vipe_spec/vim2"
+    Vimrunner.start.tap do |vim|
+      vim.command "source plugin/vipe.vim"
+      puts vim.command "cd /tmp/vipe_spec/vim2"
+    end
+  end
+
+  def pipe_path
+    vim.command("echo VipePipePath()")
+  end
 
   def clear_pipe
-    @file = Tempfile.new("pipe_spec_pipe_#{rand(9999999)}")
-    vim.normal ":let g:vipe_pipe = '#{@file.path}'<CR>"
+    @file.close rescue nil
+    @file = File.open(pipe_path, 'w+')
   end
 
   def pipe
     @file.rewind
     @file.read
   end
+
+  before { clear_pipe }
 
   it "runs the appropriate command" do
     vim.command 'Vipe echo "something"'
@@ -47,6 +61,11 @@ describe "vipe.vim" do
 
     vim.command 'VipePop'
     pipe.should =~ /aloha matata/
+  end
+
+  it "is scoped to its working directory" do
+    vim.command('echo VipePipePath()').should include "_tmp_vipe_spec_vim1"
+    other_vim.command('echo VipePipePath()').should include "_tmp_vipe_spec_vim2"
   end
 
   context "when there is no previous test" do
