@@ -4,13 +4,7 @@ command! -nargs=? Vipe call Vipe(<q-args>)
 command! VipePop call VipePop()
 
 function! VipePipePath()
-  if !exists("g:vipe_pipe")
-    let pipe_path = $HOME . "/.vipe_pipe_" .  substitute(getcwd(), '/', '_', 'g')
-  else
-    let pipe_path = g:vipe_pipe
-  endif
-
-  return pipe_path
+  return "/tmp/.vipe_pipe_" .  substitute(getcwd(), '/', '_', 'g')
 endfunction
 
 function! Vipe(...)

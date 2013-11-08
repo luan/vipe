@@ -4,7 +4,7 @@ require 'benchmark'
 require 'fileutils'
 
 postfix = Dir.pwd.gsub('/', '_')
-pipe_path = File.join(ENV['HOME'], ".vipe_pipe_#{postfix}")
+pipe_path = File.join('/tmp', ".vipe_pipe_#{postfix}")
 FileUtils.rm_f pipe_path
 `mkfifo #{pipe_path}` unless File.exists?(pipe_path)
 
