@@ -20,10 +20,14 @@ function! vipe#push(...)
   call vipe#rerun()
 endf
 
+function! vipe#run(command)
+  call writefile([a:command], vipe#pipe_path())
+  echom "[vipe] running command: " . a:command
+endf
+
 function! vipe#rerun()
   if len(s:command_stack) > 0
-    call writefile([s:command_stack[0]], vipe#pipe_path())
-    echom "[vipe] running command: " . s:command_stack[0]
+    call vipe#run(s:command_stack[0])
   else
     echom "[vipe] no commands in stack"
   end
