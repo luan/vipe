@@ -1,38 +1,38 @@
 let s:command_stack = []
 
-command! -nargs=? Vipe call Vipe(<q-args>)
-command! VipePop call VipePop()
+command! -nargs=? Vipe call vipe#push(<q-args>)
+command! VipePop call vipe#pop()
 
-function! VipePipePath()
+function! vipe#pipe_path()
   return "/tmp/.vipe_pipe_" .  substitute(getcwd(), '/', '_', 'g')
-endfunction
+endf
 
-function! Vipe(...)
+function! vipe#push(...)
   if len(a:1) == 0
-    call VipeRerun()
+    call vipe#rerun()
     return
   end
 
-  let command = join(a:000)
-  if len(s:command_stack) == 0 || s:command_stack[0] != command
+  let l:command = join(a:000)
+  if len(s:command_stack) == 0 || s:command_stack[0] != l:command
     call insert(s:command_stack, command)
   end
-  call VipeRerun()
+  call vipe#rerun()
 endf
 
-function! VipeRerun()
+function! vipe#rerun()
   if len(s:command_stack) > 0
-    call writefile([s:command_stack[0]], VipePipePath())
-    echom "Sent " . s:command_stack[0]
+    call writefile([s:command_stack[0]], vipe#pipe_path())
+    echom "[vipe] running command: " . s:command_stack[0]
   else
-    echom "No previous command ran"
+    echom "[vipe] no commands in stack"
   end
 endf
 
-function! VipePop()
+function! vipe#pop()
   if len(s:command_stack) > 0
     call remove(s:command_stack, 0)
   end
-  call VipeRerun()
+  call vipe#rerun()
 endf
 

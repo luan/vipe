@@ -19,7 +19,7 @@ describe "vipe.vim" do
   end
 
   def pipe_path
-    vim.command("echo VipePipePath()")
+    vim.command("echo vipe#pipe_path()")
   end
 
   def clear_pipe
@@ -64,13 +64,13 @@ describe "vipe.vim" do
   end
 
   it "is scoped to its working directory" do
-    vim.command('echo VipePipePath()').should include "_tmp_vipe_spec_vim1"
-    other_vim.command('echo VipePipePath()').should include "_tmp_vipe_spec_vim2"
+    vim.command('echo vipe#pipe_path()').should include "_tmp_vipe_spec_vim1"
+    other_vim.command('echo vipe#pipe_path()').should include "_tmp_vipe_spec_vim2"
   end
 
   context "when there is no previous test" do
     it "warns the user when trying to re-run" do
-      vim.command('Vipe').should =~ /No previous command ran/
+      vim.command('Vipe').should =~ /no commands in stack/
       pipe.should == ''
     end
   end
