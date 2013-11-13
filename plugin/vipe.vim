@@ -15,7 +15,7 @@ function! vipe#push(...)
 
   let l:command = join(a:000)
   if len(s:command_stack) == 0 || s:command_stack[0] != l:command
-    call insert(s:command_stack, command)
+    call insert(s:command_stack, l:command)
   end
   call vipe#rerun()
 endf
