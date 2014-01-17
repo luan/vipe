@@ -3,11 +3,6 @@
 require 'benchmark'
 require 'fileutils'
 
-postfix = Dir.pwd.gsub('/', '_')
-pipe_path = File.join('/tmp', ".vipe_pipe_#{postfix}")
-FileUtils.rm_f pipe_path
-`mkfifo #{pipe_path}` unless File.exists?(pipe_path)
-
 def print_info(command=nil)
   system "clear"
   puts "\x1b[35m#{"-" * 80}\x1b[0m"
@@ -21,6 +16,7 @@ def print_time(time)
 
   puts
   print "\x1b[37mTook: \x1b[0m"
+
   print "\x1b[36m"
   print "#{minutes}m" if minutes > 0
   print "#{seconds}s"
@@ -28,17 +24,40 @@ def print_time(time)
   puts
 end
 
+def run_command(command)
+  print_info command
+  time = Benchmark.realtime do
+    system command
+  end
+
+  print_time time
+end
+
 print_info
+
+postfix = Dir.pwd.gsub('/', '_')
+pipe_path = File.join('/tmp', ".vipe_pipe_#{postfix}")
+
+if File.exists?(pipe_path) && File.ftype(pipe_path) != "fifo"
+  cached_command = File.readlines(pipe_path).last
+  FileUtils.rm_f pipe_path 
+end
+
+`mkfifo #{pipe_path}` unless File.exists?(pipe_path)
+
+trap 'INT' do
+  puts
+  puts "Cleaning up..."
+  FileUtils.rm_f pipe_path 
+  exit
+end
+
+run_command cached_command if cached_command
 
 File.open pipe_path, 'w+' do |file|
   loop do
     command = file.gets
-    print_info command
-    time = Benchmark.realtime do
-      system command
-    end
-
-    print_time time
+    run_command(command)
   end
 end
 
