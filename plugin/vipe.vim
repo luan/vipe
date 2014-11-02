@@ -13,7 +13,7 @@ function! vipe#raw_pop()
   end
 endf
 
-function vipe#raw_push(command)
+function! vipe#raw_push(command)
   if vipe#raw_peek() == 0 || vipe#raw_peek() != a:command
    call insert(s:command_stack, a:command)
   end
