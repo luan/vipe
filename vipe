@@ -56,7 +56,7 @@ run_command cached_command if cached_command
 
 File.open pipe_path, 'w+' do |file|
   loop do
-    command = file.gets
+    command = file.gets.gsub(/\000/,"\n")
     run_command(command)
   end
 end
